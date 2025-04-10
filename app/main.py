@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
 from .routers import nasa
 
@@ -18,6 +19,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/", response_class=PlainTextResponse)
+def health_check():
+    return "OK"
+
 
 # Nasa APIs
 app.include_router(nasa.router, prefix="/api/v1")
