@@ -13,5 +13,5 @@
 
 ### cloud run
 
-- `docker build -t us-central1-docker.pkg.dev/manpreet-singh-07/personal/space-api:latest .`
-- `docker push us-central1-docker.pkg.dev/manpreet-singh-07/personal/space-api:latest`
+- `docker build -t us-central1-docker.pkg.dev/manpreet-singh-07/portfolio/space-api:latest .`
+- `docker push us-central1-docker.pkg.dev/manpreet-singh-07/portfolio/space-api:latest`
