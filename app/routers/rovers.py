@@ -4,7 +4,9 @@ from fastapi import APIRouter, Query
 
 from app.services.nasa import (
     get_rover_photos_by_sol,
-    get_rover_photos_by_earth_date
+    get_rover_photos_by_earth_date,
+    get_rover_latest_photos,
+    get_rover_manifests
 )
 
 
@@ -12,6 +14,16 @@ router = APIRouter(prefix="/rovers", tags=["Rovers"])
 
 
 # Rovers API
+@router.get("/manifests/{rover}")
+async def get_manifests_by_rover(rover):
+    return await get_rover_manifests(rover)
+
+
+@router.get("/{rover}/latest_photos")
+async def get_latest_photos_by_rover(rover):
+    return await get_rover_latest_photos(rover)
+
+
 @router.get("/{rover}/photos/by_sol")
 async def get_photos_by_sol(
     rover,
