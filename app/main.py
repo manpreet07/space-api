@@ -4,6 +4,7 @@ from fastapi.responses import PlainTextResponse
 
 import logging
 
+from app.proxy_headers import ProxyHeaderFixMiddleware
 from app.routers import apod, rovers
 
 logging.basicConfig(level=logging.INFO)
@@ -11,11 +12,15 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+
+app.add_middleware(ProxyHeaderFixMiddleware)
+
 origins = [
     "http://localhost:5000",
     "http://localhost:5001",
     "https://manpreet-singh.me"
 ]
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
