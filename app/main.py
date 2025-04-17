@@ -39,5 +39,3 @@ def health_check():
 # Nasa APIs
 app.include_router(apod.router, prefix="/api/v1")
 app.include_router(rovers.router, prefix="/api/v1")
-
-
