@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Authenticate to Google Cloud
           command: |
-            echo $GCLOUD_SERVICE_KEY > /tmp/gcloud-key.json
+            echo "$GCLOUD_SERVICE_KEY" | base64 --decode > /tmp/gcloud-key.json
             gcloud auth activate-service-account --key-file=/tmp/gcloud-key.json
             gcloud config set project manpreet-singh-07
             gcloud auth configure-docker us-central1-docker.pkg.dev          
