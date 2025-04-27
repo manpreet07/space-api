@@ -14,8 +14,31 @@ jobs:
           name: Run Tests
           command: |
             pytest
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - .            
+
+
+  deploy:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - attach_workspace:
+          at: ~/project 
+      - run:
+          name: Build Docker image 
+          command: |
+            docker build -t us-central1-docker.pkg.dev/manpreet-singh-07/portfolio/space-api:latest .
+      - run:
+          name: Push Docker image 
+          command: |
+            docker push us-central1-docker.pkg.dev/manpreet-singh-07/portfolio/space-api:latest
 
 workflows:
   build-and-deploy:
     jobs:
       - build_and_test
+      - deploy:
+          requires:
+            - build_and_test
