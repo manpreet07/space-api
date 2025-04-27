@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  gcp-cli: circleci/gcp-cli@3.3.1
+  
 jobs:
   build_and_test:
     docker:
@@ -14,8 +17,39 @@ jobs:
           name: Run Tests
           command: |
             pytest
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - .            
+
+
+  deploy:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - attach_workspace:
+          at: ~/project 
+      - gcp-cli/install
+      - run:
+          name: Authenticate to Google Cloud
+          command: |
+            echo "$GCLOUD_SERVICE_KEY" | base64 --decode > /tmp/gcloud-key.json
+            gcloud auth activate-service-account --key-file=/tmp/gcloud-key.json
+            gcloud config set project manpreet-singh-07
+            gcloud auth configure-docker us-central1-docker.pkg.dev          
+      - run:
+          name: Build Docker image 
+          command: |
+            docker build -t us-central1-docker.pkg.dev/manpreet-singh-07/portfolio/space-api:latest .
+      - run:
+          name: Push Docker image 
+          command: |
+            docker push us-central1-docker.pkg.dev/manpreet-singh-07/portfolio/space-api:latest
 
 workflows:
   build-and-deploy:
     jobs:
       - build_and_test
+      - deploy:
+          requires:
+            - build_and_test
