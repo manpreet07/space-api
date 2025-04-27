@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  gcp-cli: circleci/gcp-cli@3.3.1
+  
 jobs:
   build_and_test:
     docker:
@@ -21,20 +24,12 @@ jobs:
 
 
   deploy:
-    docker:
-      - image: ubuntu-2204:current
-        auth:
-          username: _json_key
-          password: $GCLOUD_SERVICE_KEY 
+    machine:
+      image: ubuntu-2204:current
     steps:
       - attach_workspace:
           at: ~/project 
-      - run:
-          name: Install Google Cloud SDK
-          command: |
-            curl https://sdk.cloud.google.com | bash
-            exec -l $SHELL
-            gcloud components install docker-credential-gcr
+      - gcp-cli/install
       - run:
           name: Authenticate to Google Cloud
           command: |
