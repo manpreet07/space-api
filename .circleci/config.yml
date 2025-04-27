@@ -22,10 +22,26 @@ jobs:
 
   deploy:
     docker:
-      - image: cimg/python:3.12
+      - image: ubuntu-2204:current
+        auth:
+          username: _json_key
+          password: $GCLOUD_SERVICE_KEY 
     steps:
       - attach_workspace:
           at: ~/project 
+      - run:
+          name: Install Google Cloud SDK
+          command: |
+            curl https://sdk.cloud.google.com | bash
+            exec -l $SHELL
+            gcloud components install docker-credential-gcr
+      - run:
+          name: Authenticate to Google Cloud
+          command: |
+            echo $GCLOUD_SERVICE_KEY > /tmp/gcloud-key.json
+            gcloud auth activate-service-account --key-file=/tmp/gcloud-key.json
+            gcloud config set project manpreet-singh-07
+            gcloud auth configure-docker us-central1-docker.pkg.dev          
       - run:
           name: Build Docker image 
           command: |
