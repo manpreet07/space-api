@@ -3,16 +3,16 @@ import os
 import pathlib
 from dotenv import load_dotenv
 from fastapi import HTTPException
-import httpx
 
 from app.redis_client import Redis_Client
+from app.services.utils import send_request
 
 BASE_DIR = pathlib.Path(__file__).parent
 env_path = BASE_DIR / '.env'
 load_dotenv(dotenv_path=env_path, override=True)
 
 
-class Nasa:
+class MarsRoverPhotos:
     base_url: str
 
     def __init__(self):
@@ -22,10 +22,10 @@ class Nasa:
         if base_url is None:
             raise EnvironmentError("NASA_API_BASE_URL must be set")
 
-        if base_url is None:
+        if api_key is None:
             raise EnvironmentError("NASA_API_KEY must be set")
 
-        print(f"🔌 Connecting NASA Api at: {base_url}")
+        print(f"Connecting NASA Api at: {base_url}")
 
         self.base_url = base_url
         self.api_key = api_key
@@ -39,7 +39,7 @@ class Nasa:
         if cached:
             return json.loads(cached)
 
-        return await self.send_request(url, key)
+        return await send_request(url, key, self.redis)
 
     async def get_rover_manifests(self, r):
         url = (
@@ -52,7 +52,7 @@ class Nasa:
         if cached:
             return json.loads(cached)
 
-        return await self.send_request(url, key)
+        return await send_request(url, key, self.redis)
 
     async def get_rover_latest_photos(self, r):
         url = (
@@ -65,7 +65,7 @@ class Nasa:
         if cached:
             return json.loads(cached)
 
-        return await self.send_request(url, key)
+        return await send_request(url, key, self.redis)
 
     async def get_rover_photos_by_sol(self, r, sol, camera, page):
         query_param = []
@@ -98,7 +98,7 @@ class Nasa:
         if cached:
             return json.loads(cached)
 
-        return await self.send_request(url, key)
+        return await send_request(url, key, self.redis)
 
     async def get_rover_photos_by_earth_date(
             self,
@@ -136,30 +136,4 @@ class Nasa:
         if cached:
             return json.load(cached)
 
-        return await self.send_request(url, final_param)
-
-    async def send_request(self, url: str, key: str):
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(url)
-            if response.status_code == 404:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Resource not found on external API."
-                )
-            response.raise_for_status()
-            await self.redis.client.set(
-                f'{key}',
-                json.dumps(response.json())
-            )
-            return response.json()
-        except httpx.RequestError as exc:
-            raise HTTPException(
-                status_code=503,
-                detail=f"Error contacting external API: {exc}"
-            )
-        except httpx.HTTPStatusError as exc:
-            raise HTTPException(
-                status_code=exc.response.status_code,
-                detail=str(exc)
-            )
+        return await send_request(url, final_param, self.redis)

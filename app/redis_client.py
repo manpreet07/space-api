@@ -20,7 +20,7 @@ class Redis_Client:
             raise EnvironmentError("REDIS_PORT must be set")
 
         redis_url = f"redis://{redis_host}:{redis_port}"
-        print(f"🔌 Connecting to Redis at: {redis_url}")
+        print(f"Connecting to Redis at: {redis_url}")
 
         self._client = redis.Redis.from_url(
             redis_url,

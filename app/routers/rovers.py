@@ -2,12 +2,12 @@
 
 from fastapi import APIRouter, Query
 
-from app.services.nasa import Nasa
+from app.services.mars_rovers_photos import MarsRoverPhotos
 
 
 router = APIRouter(prefix="/rovers", tags=["Rovers"])
 
-nasa_api = Nasa()
+nasa_api = MarsRoverPhotos()
 
 
 # Rovers API
