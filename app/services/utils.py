@@ -17,7 +17,8 @@ async def send_request(url: str, key: str, redis: Redis_Client):
         response.raise_for_status()
         await redis.client.set(
             f'{key}',
-            json.dumps(response.json())
+            json.dumps(response.json()),
+            ex=86400
         )
         return response.json()
     except httpx.RequestError as exc:
