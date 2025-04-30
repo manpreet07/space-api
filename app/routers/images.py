@@ -22,25 +22,45 @@ router = APIRouter(prefix="/images", tags=["Images"])
 # Nasa APIs
 @router.get("/")
 async def get_images(q):
-    nasa_api = NasaImages()
-    response = await nasa_api.get_images(q)
+    message = "Sorry, this app only show space related images and videos " \
+        "from NASA. Please ask about something in space."
 
-    if response and len(response["collection"]["items"]) > 0:
-        for item in response["collection"]["items"]:
-            for d in item["data"]:
-                links = await nasa_api.get_images_links(d["nasa_id"])
-                d["links"] = links["collection"]["items"]
-        return response["collection"]["items"]
+    completion = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        store=True,
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a space keyword extractor. Your job is to return"
+                    " a list of space-related keywords "
+                    "from the user's request. Only include terms related to"
+                    " space, astronomy, planets, celestial bodies, "
+                    "space missions, or related science. Return the result as"
+                    " a plain, comma-separated string of keywords in "
+                    "lowercase, without brackets. Do not include duplicates "
+                    "or unrelated terms.if there are no"
+                    f" space related words found return: {message}"
+                )
+            },
+            {
+                "role": "user",
+                "content": q
+            }
+        ],
+        temperature=0
+    )
+
+    query = completion.choices[0].message.content
+    if query != message:
+        nasa_api = NasaImages()
+        response = await nasa_api.get_images(query)
+
+        if response and len(response["collection"]["items"]) > 0:
+            for item in response["collection"]["items"]:
+                for d in item["data"]:
+                    links = await nasa_api.get_images_links(d["nasa_id"])
+                    d["links"] = links["collection"]["items"]
+            return response["collection"]["items"]
     else:
-        prompt = "provide user list of space related keyowrds, " \
-            "also mention this app only to search " \
-            "space related images and videos from NASA"
-
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            store=True,
-            messages=[
-                {"role": "system", "content": prompt}
-            ]
-        )
         return {"content": completion.choices[0].message.content}

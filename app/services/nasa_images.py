@@ -20,8 +20,6 @@ class NasaImages:
         if base_url is None:
             raise EnvironmentError("NASA_IMAGES_API_BASE_URL must be set")
 
-        print(f"Connecting NASA Api at: {base_url}")
-
         self.base_url = base_url
         self.redis = Redis_Client()
 
