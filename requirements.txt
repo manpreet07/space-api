@@ -24,7 +24,6 @@ markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
 mypy-extensions==1.0.0
-openai==1.76.0
 orjson==3.10.16
 packaging==24.2
 pathspec==0.12.1
