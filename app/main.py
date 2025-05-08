@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
@@ -10,8 +11,13 @@ from app.routers import apod, images, rovers
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+is_prod = os.getenv("ENV") == "production"
 
+app = FastAPI(
+    docs_url=None if is_prod else "/docs",
+    redoc_url=None if is_prod else "/redoc",
+    openapi_url=None if is_prod else "/openapi.json",
+)
 
 app.add_middleware(ProxyHeaderFixMiddleware)
 
