@@ -6,7 +6,7 @@ from fastapi.responses import PlainTextResponse
 import logging
 
 from app.proxy_headers import ProxyHeaderFixMiddleware
-from app.routers import apod, images, rovers
+from app.routers import apod, rovers
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -46,4 +46,3 @@ def health_check():
 # Nasa APIs
 app.include_router(apod.router, prefix="/api/v1")
 app.include_router(rovers.router, prefix="/api/v1")
-app.include_router(images.router, prefix="/api/v1")
