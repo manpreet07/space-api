@@ -1,3 +1,4 @@
+from datetime import date
 import json
 import os
 import pathlib
@@ -33,7 +34,7 @@ class MarsRoverPhotos:
 
     async def get_planetary_apod(self):
         url = f"{self.base_url}/planetary/apod?api_key={self.api_key}"
-        key = 'apod:photo'
+        key = f'apod:photo:{date.today()}'
         cached = await self.redis.client.get(key)
 
         if cached:
@@ -46,7 +47,7 @@ class MarsRoverPhotos:
             f"{self.base_url}/mars-photos/api/v1/manifests/{r}"
             f"?api_key={self.api_key}"
         )
-        key = f'{r}:manifests'
+        key = f'{r}:manifests:{date.today()}'
         cached = await self.redis.client.get(key)
 
         if cached:
@@ -59,7 +60,7 @@ class MarsRoverPhotos:
             f"{self.base_url}/mars-photos/api/v1/rovers/{r}/latest_photos"
             f"?api_key={self.api_key}"
         )
-        key = f'{r}:latest_photos'
+        key = f'{r}:latest_photos:{date.today()}'
         cached = await self.redis.client.get(key)
 
         if cached:
@@ -92,7 +93,7 @@ class MarsRoverPhotos:
         final_param = "".join(query_param)
         url = url + final_param
 
-        key = f'{r}:{final_param}'
+        key = f'{r}:{final_param}:{date.today()}'
         cached = await self.redis.client.get(key)
 
         if cached:
